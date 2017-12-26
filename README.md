@@ -17,3 +17,4 @@ Installation Instruction
   ![Error when attempt to install app without certificate](ErrorNoCert.PNG)
 
 Note that to use the C/C++ Interpreter, you do not need to get all Microsft's C/C++ headers and libraries. If necessary, you can get the ISO C/C++ headers.
+  ![Interpreter in action](Interpreter.PNG)
