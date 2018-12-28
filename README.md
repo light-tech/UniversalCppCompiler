@@ -15,13 +15,26 @@ There are 3 required steps and 1 optional step:
      ![Enable developer mode](EnableDevMode.PNG)
   3. Download our app release package from [our release page](https://github.com/light-tech/UniversalCppCompiler/releases) such as `CppCompiler_2.6.0.0.7z`. Extract it with [7-zip](https://www.7-zip.org/), open the extracted folder, right click on the PowerShell script `Add-AppDevPackage.ps1` and select `Run with PowerShell`.
      ![Install](InstallWithPS.PNG)
-  4. (__Optional__) If you only want to use the C/C++ interpreter, you do not need to get all Microsoft's C/C++ headers (i.e. those standard C `stdio.h`, `stdlib.h`, ... or Microsoft SDK `windows.h`) and libraries. If you want to __compile__ your programs into executable (i.e. `.exe` files), you need to obtain and copy them to the correct places.
+  4. (__Optional__) If you only want to use the C/C++ interpreter, you DO NOT need to get all Microsoft's C/C++ headers (i.e. those standard C `stdio.h`, `stdlib.h`, ... or Microsoft SDK `windows.h`) and libraries; BUT you do need to add the correct function prototype. If you want to __compile__ your programs into executable (i.e. `.exe` files), you need to obtain and copy them to the correct places. These files are distributed at different places (some are in the Windows SDK, some are in Visual C++, ...) of a Visual Studio installation.
 
-Examples
+Tutorial
 --------
 
-Head over to [our repository](https://github.com/light-tech/DevMaxGettingStarted) to learn how to get started using DevMax C/C++ interpreter.
+Learn how to get started using DevMax/C++ Compiler with our 3-part tutorial:
 
-You can learn more about software development with [our path processing library example](https://github.com/light-tech/DevMaxPathLibrary) or a [more complicated software](https://github.com/light-tech/DevMaxGeometry) to do computations in geometry. (We are still in progress of writing these examples. Any input is welcome.)
+ * [_1: Hello world!_](https://github.com/light-tech/DevMaxGettingStarted)
+
+   This tutorial teaches you how to set-up your project and how to communicate with the DevMax C/C++ interpreter.
+
+ * [_2: Software := Design x Test x Implement_](https://github.com/light-tech/DevMaxPathLibrary)
+
+   This example shows the intended usage of DevMax via the design, implementation and testing workflow of a simple file/directory path processing library.
+
+ * [_3: The sky is the limit_](https://github.com/light-tech/DevMaxGeometry)
+
+   We illustrate a sophisticated exploit of DevMax: to write your own diagram generation software.
+
+**Note**: We are still in progress of writing these examples. Any input is welcome.
 
 Happy Coding!
+-------------
