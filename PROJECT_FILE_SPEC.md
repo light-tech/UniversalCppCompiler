@@ -50,6 +50,8 @@ Example
 
 Let us take a simple example. Assuming `$ProjectDir` refers to where this project is located, for example `<...>/C++Projects/ExampleProject`. Then `$SysIncludeDir := $ProjectDir../../C++Include` and `$SysLibDir := $ProjectDir../../C++Lib`.
 
+__Tip:__ You can access `$SysIncludeDir` by typing `%localappdata%\Publishers\8vrbkgtyqrt4j\C++Include` in File Explorer. Similarly, pasting `%localappdata%\Publishers\8vrbkgtyqrt4j\C++Lib` will bring you to `$SysLibDir`.
+
 ```JSON
 {
 "version":1,
@@ -88,9 +90,8 @@ Let us take a simple example. Assuming `$ProjectDir` refers to where this projec
 ```
 
 Running the build definition `"Build program"` has the effect similar to that of running two fairly long commands:
-```
+```Bash
 clang -isystem $SysIncludeDir/ucrt -isystem $SysIncludeDir/msvc -I $ProjectDir -fms-extensions -fms-compatibility -x c++ -std=c++14 -w -c $ProjectDir/src/Source.cpp -o $ProjectDir/src/Source.o
-
 link /libpath:$SysLibDir/msvc /libpath:$SysLibDir/winsdk /defaultlib:msvcrt.lib /subsystem:Console $ProjectDir/src/Source.o /out:$ProjectDir/Source.exe
 ```
 It is safer than writing these commands if you need to quote arguments correctly.
