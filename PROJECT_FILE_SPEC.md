@@ -3,54 +3,68 @@ Project File Specification
 
 The project description file `project.json` is a simple human-readable [JSON]() file. An example can be found in our [Getting Started](https://github.com/light-tech/DevMaxGettingStarted) repository.
 
+Throughout this document, we assume `$ProjectDir` refers to where the project is located i.e. the folder containing the `project.json` file; for example `<...>/C++Projects/ExampleProject`. Then we have
+ * the system include root is `$SysIncludeDir := $ProjectDir../../C++Include`; and
+ * the system lib root is `$SysLibDir := $ProjectDir../../C++Lib`.
+
+__Tip:__ You can access `$SysIncludeDir` by typing `%localappdata%\Publishers\8vrbkgtyqrt4j\C++Include` in File Explorer. Similarly, pasting `%localappdata%\Publishers\8vrbkgtyqrt4j\C++Lib` will bring you to `$SysLibDir`.
+
 Project
 -------
 
 The whole file is a JSON object of "type" `PROJECT` consisting of the following members
-```JSON
+```JavaScript
 PROJECT {
-"version": INT,
-"name": STRING,
-"build_commands": BUILD_COMMAND_MAP,
-"build_definitions": ARRAY of BUILD_DEFINITION
+	"version"           : INTEGER,
+	"name"              : STRING,
+	"build_commands"    : BUILD_COMMAND_MAP,
+	"build_definitions" : ARRAY OF BUILD_DEFINITION
 }
 ```
 
 Build commands
 --------------
 
-`BUILD_COMMAND_MAP` is a JSON object treated as an association (i.e. a dictionary) from `STRING` to `BUILD_COMMAND` object which are of the following structure:
-```JSON
+`BUILD_COMMAND_MAP` is a JSON object treated as an association (i.e. a dictionary) from `STRING -> BUILD_COMMAND`.
+```JavaScript
 BUILD_COMMAND {
-"action": ONE OF "interpret" OR "compile" OR "link",
-"args": ARRAY OF STRINGS,
-"sys_include_dir": ARRAY OF STRINGS,
-"include_dir": ARRAY OF STRINGS,
-"sys_lib_dir": ARRAY OF STRINGS
+	"action"          : STRING "interpret" OR "compile" OR "link",
+	"args"            : ARRAY OF STRING,
+	"sys_include_dir" : ARRAY OF STRING,
+	"include_dir"     : ARRAY OF STRING,
+	"sys_lib_dir"     : ARRAY OF STRING
 }
 ```
-The interpretation of the other members are determined by the `"action"` key. In any case, the fields `sys_include_dir`, `include_dir` and `sys_lib_dir` are RELATIVE paths to be expanded to absolute pathh by DevMax: Each relative path in `sys_include_dir` are to be prepended with the path to `C++Include`and similarly, `sys_lib_dir` with the path to `C++Lib` folder. (These folders are in the same place as `C++Projects` folder.) The paths in `include_dir` are, on the other hand, treated relative to the project folder. Needless to say, `sys_lib_dir` is only considered when the action is `link` whereas the `*include_dir` are only considered for the other two actions.
-The member `args` consists of the command line arguments (switches) you usually pass to clang compiler or linker.
+The interpretation of the other members are determined by the `action` key. In any case, the fields `sys_include_dir`, `include_dir` and `sys_lib_dir` are __RELATIVE__ paths to be expanded to absolute path by DevMax i.e. prepended with `$SysIncludeDir` and `$SysLibDir` respectively. The paths in `include_dir` are, on the other hand, interpreted relative to `$ProjectDir`.
+
+Needless to say, `sys_lib_dir` is only considered when the action is `link` whereas the `*include_dir` are only considered for the other two actions.
+
+The field `args` consists of the command line arguments (switches) you usually pass to clang compiler or linker.
 
 Build definition
 ----------------
 
 A `BUILD_DEFINITION` object consists of a name and an array of `BUILD_STEP`.
-```JSON
+```JavaScript
+BUILD_DEFINITION {
+	"name"        : STRING,
+	"build_steps" : ARRAY OF BUILD_STEP
+}
+
 BUILD_STEP {
-"command" : Name of a BUILD_COMMAND defined in parent PROJECT object,
-"inputs": ARRAY of STRING,
-"output": STRING
+	"command"  : STRING,
+	"inputs"   : ARRAY OF STRING,
+	"output"   : STRING,
 }
 ```
-When executing a `BUILD_DEFINITION`, DevMax further adds the `inputs` and `output` to the command after prepending these relative paths with the path to the project.
+The `command` field denote the name of a `BUILD_COMMAND` defined in parent `PROJECT` object. When executing a `BUILD_DEFINITION`, DevMax further adds the `inputs` and `output` to the command after prepending these relative paths with the path to the project.
+
+`BUILD_STEP` extends `BUILD_COMMAND` so if you don't specify `command`, you can put the whole definition of the object (i.e. `action`, `args`, etc.) in `BUILD_STEP` and an anonymous command will be created.
 
 Example
 -------
 
-Let us take a simple example. Assuming `$ProjectDir` refers to where this project is located, for example `<...>/C++Projects/ExampleProject`. Then `$SysIncludeDir := $ProjectDir../../C++Include` and `$SysLibDir := $ProjectDir../../C++Lib`.
-
-__Tip:__ You can access `$SysIncludeDir` by typing `%localappdata%\Publishers\8vrbkgtyqrt4j\C++Include` in File Explorer. Similarly, pasting `%localappdata%\Publishers\8vrbkgtyqrt4j\C++Lib` will bring you to `$SysLibDir`.
+Let us take a simple example. We also illustrate using uninterpreted field to write comments, see the declaration of the `CompileC++` build command. (Note that JSON doesn't support C-style line/block comment.)
 
 ```JSON
 {
@@ -84,12 +98,24 @@ __Tip:__ You can access `$SysIncludeDir` by typing `%localappdata%\Publishers\8v
 				"output":"Source.exe"
 			}
 		]
+	},
+	{
+		"name":"Inline/anonymous build command",
+		"build_steps": [
+			{
+				"action":"compile",
+				"args":["-fms-extensions", "-fms-compatibility", "-x", "c++", "-std=c++14", "-w"],
+				"sys_include_dir":["ucrt", "msvc"],
+				"include_dir":[""],
+				"inputs":["src/Source.cpp"]
+			}
+		]
 	}
 ]
 }
 ```
 
-Running the build definition `"Build program"` has the effect similar to that of running two fairly long commands:
+Running the build definition `"Build program"` in DevMax UI has the effect similar to that of running two fairly long commands:
 ```Bash
 clang -isystem $SysIncludeDir/ucrt -isystem $SysIncludeDir/msvc -I $ProjectDir -fms-extensions -fms-compatibility -x c++ -std=c++14 -w -c $ProjectDir/src/Source.cpp -o $ProjectDir/src/Source.o
 link /libpath:$SysLibDir/msvc /libpath:$SysLibDir/winsdk /defaultlib:msvcrt.lib /subsystem:Console $ProjectDir/src/Source.o /out:$ProjectDir/Source.exe
