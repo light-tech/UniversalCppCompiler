@@ -55,11 +55,14 @@ BUILD_STEP {
 	"command"  : STRING,
 	"inputs"   : ARRAY OF STRING,
 	"output"   : STRING,
+	"log_file" : STRING (C++ Compiler >= 2.6.1)
 }
 ```
-The `command` field denote the name of a `BUILD_COMMAND` defined in parent `PROJECT` object. When executing a `BUILD_DEFINITION`, DevMax further adds the `inputs` and `output` to the command after prepending these relative paths with the path to the project.
+The `command` field denote the name of a `BUILD_COMMAND` defined in parent `PROJECT` object. When executing a `BUILD_DEFINITION`, DevMax further adds the `inputs` and `output` to the command after prepending these relative paths with the path to the project. Strings specified in `inputs` and `output` are paths relative to `$ProjectDir`.
 
 `BUILD_STEP` extends `BUILD_COMMAND` so if you don't specify `command`, you can put the whole definition of the object (i.e. `action`, `args`, etc.) in `BUILD_STEP` and an anonymous command will be created.
+
+In version >= 2.6.1 of C++ Compiler, we added a new field `log_file` for the compilation log.
 
 Example
 -------
